@@ -2,8 +2,12 @@ using System;
 
 namespace BankingApp;
 
+
+
 public class App
 {
+    private User? _currentUser;
+
     public int Execute(string[] args)
     {
         if (args.Length == 0)
@@ -30,6 +34,12 @@ public class App
         {
             case "init":
                 return Init(args);
+
+            case "register":
+                return Register(args);
+
+            case "login":
+                return Login(args);
 
             case "list":
                 return HandleList(args);
@@ -59,6 +69,59 @@ public class App
         return 0;
     }
 
+    private int Register(string[] args)
+    {
+        if (args.Length < 4)
+        {
+            Console.WriteLine("Usage: teller register <name> <password>");
+            return 1;
+        }
+
+        var name = args[2];
+        var password = args[3];
+
+        var service = new UserService();
+        var user = service.Register(name, password);
+
+        Console.WriteLine("User created!");
+        Console.WriteLine($"Name: {user.Name}");
+        Console.WriteLine($"Account number: {user.AccountNumber}");
+
+        return 0;
+    }
+
+    private int Login(string[] args)
+    {
+        if (args.Length < 4)
+        {
+            Console.WriteLine("Usage: teller login <accountNumber> <password>");
+            return 1;
+        }
+
+        var accountNumber = args[2];
+        var password = args[3];
+
+        var service = new UserService();
+        var users = service.GetUsers();
+
+        var user = users.FirstOrDefault(u =>
+            u.AccountNumber == accountNumber &&
+            u.Password == password);
+
+        if (user == null)
+        {
+            Console.WriteLine("Invalid credentials");
+            return 1;
+        }
+
+        _currentUser = user;
+
+        Console.WriteLine("Login successful");
+        Console.WriteLine($"Welcome {user.Name}");
+
+        return 0;
+    }
+
     private int HandleList(string[] args)
     {
         if (args.Length < 3)
@@ -72,8 +135,15 @@ public class App
         switch (sub)
         {
             case "accounts":
+                if (_currentUser == null)
+                {
+                    Console.WriteLine("You must login first!");
+                    return 1;
+                }
+
+
                 var service = new AccountService();
-                var accounts = service.GetAccounts(1);
+                var accounts = service.GetAccounts(_currentUser.Id);
 
                 foreach (var acc in accounts)
                 {
