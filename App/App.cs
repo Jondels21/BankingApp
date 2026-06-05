@@ -1,0 +1,191 @@
+using System;
+
+namespace BankingApp;
+
+public class App
+{
+    public int Execute(string[] args)
+    {
+        if (args.Length == 0)
+        {
+            PrintHelp();
+            return 0;
+        }
+
+        if (args[0] != "teller")
+        {
+            Console.WriteLine("Error: command must start with 'teller'.");
+            return 1;
+        }
+
+        if (args.Length == 1)
+        {
+            PrintHelp();
+            return 0;
+        }
+
+        var command = args[1];
+
+        switch (command)
+        {
+            case "init":
+                return Init(args);
+
+            case "list":
+                return HandleList(args);
+
+            case "show":
+                return HandleShow(args);
+
+            case "--help":
+            case "-h":
+                PrintHelp();
+                return 0;
+
+            case "--version":
+            case "-V":
+                Console.WriteLine("Banking CLI v1.0");
+                return 0;
+
+            default:
+                Console.WriteLine("Unknown command");
+                return 1;
+        }
+    }
+
+    private int Init(string[] args)
+    {
+        Console.WriteLine("Configuration started");
+        return 0;
+    }
+
+    private int HandleList(string[] args)
+    {
+        if (args.Length < 3)
+        {
+            Console.WriteLine("Error: missing list-subcommand");
+            return 1;
+        }
+
+        var sub = args[2];
+
+        switch (sub)
+        {
+            case "accounts":
+                var service = new AccountService();
+                var accounts = service.GetAccounts(1);
+
+                foreach (var acc in accounts)
+                {
+                    Console.WriteLine($"{acc.Id} | {acc.Name} | {acc.Balance}");
+                }
+                break;
+
+            case "users":
+                var userservice = new UserService();
+                var users = userservice.GetUsers();
+
+                foreach (var user in users)
+                {
+                    Console.WriteLine($"{user.Id} | {user.Name}");
+                }
+                break;
+
+            case "transactions":
+                Console.WriteLine("Listing transactions...");
+                break;
+
+            case "counterparties":
+                Console.WriteLine("Listing counterparties...");
+                break;
+
+            case "balances":
+                Console.WriteLine("Listing balances...");
+                break;
+
+            case "outgoings":
+                Console.WriteLine("Listing outgoings...");
+                break;
+
+            case "incomings":
+                Console.WriteLine("Listing incomings...");
+                break;
+
+            default:
+                Console.WriteLine("Unknown list-command");
+                return 1;
+        }
+        return 0;
+    }
+
+    private int HandleShow(string[] args)
+    {
+        if (args.Length < 3)
+        {
+            Console.WriteLine("Error: missing show-subcommand");
+            return 1;
+        }
+
+        var sub = args[2];
+
+        switch (sub)
+        {
+            case "balance":
+                Console.WriteLine("Showing balance...");
+                break;
+
+            case "outgoing":
+                Console.WriteLine("Showing outgoing...");
+                break;
+
+            case "incoming":
+                Console.WriteLine("Showing incoming...");
+                break;
+
+            default:
+                Console.WriteLine("Unknown show-command");
+                return 1;
+        }
+
+    return 0;
+    }
+
+    private static void PrintHelp()
+    {
+        Console.WriteLine("Usage:");
+        Console.WriteLine("     teller init");
+        Console.WriteLine("     teller [list] accounts");
+        Console.WriteLine("     teller [list] transactions [<account> --timeframe=<tf> --show-description]");
+        Console.WriteLine("     teller [list] counterparties [<account> --timeframe=<tf> --count=<n>]");
+        Console.WriteLine("     teller [list] (balances|outgoings|incomings) [<account> --interval=<itv> --timeframe=<tf> --output=<of>]");
+        Console.WriteLine("     teller [show] balance [<account> --hide-currency]");
+        Console.WriteLine("     teller [show] outgoing [<account> --hide-currency]");
+        Console.WriteLine("     teller [show] incoming [<account> --hide-currency]");
+        Console.WriteLine("     teller [--help | --version]");
+        Console.WriteLine();
+        Console.WriteLine("Commands:");
+        Console.WriteLine("     init        Configure");
+        Console.WriteLine("     list accounts        List accounts.");
+        Console.WriteLine("     list transactions        List transactions.");
+        Console.WriteLine("     list counterparties        List outgoing amounts grouped by counterparties.");
+        Console.WriteLine("     list balances        List balances during a timeframe.");
+        Console.WriteLine("     list outgoings        List outgoings during a timeframe.");
+        Console.WriteLine("     list incomings        List incomings during a timeframe.");
+        Console.WriteLine("     show balance        Show the current balance.");
+        Console.WriteLine("     show outgoing        Show the current outgoing.");
+        Console.WriteLine("     show incoming        Show the current incoming.");
+        Console.WriteLine();
+        Console.WriteLine("NOTE: By default commands are applied to the 'current' <account>.");
+        Console.WriteLine();
+        Console.WriteLine("Options:");
+        Console.WriteLine("     -h --help       Show this screen.");
+        Console.WriteLine("     -V --version       Show version.");
+        Console.WriteLine("     -i --interval=<itv>       Group by an interval of time [default: monthly].");
+        Console.WriteLine("     -t --timeframe=<tf>       Operate upon a named period of time [default: 6-months].");
+        Console.WriteLine("     -c --count=<n>       Only the top N elements [default: 10].");
+        Console.WriteLine("     -d --show-description       Show description against transactions.");
+        Console.WriteLine("     -m --hide-currency       Show money without currency codes.");
+        Console.WriteLine("     -o --output=<of>       output in a particular format (e.g spark).");
+    }
+
+}
