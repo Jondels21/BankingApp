@@ -12,9 +12,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="sampleQuotes.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="Data/accounts.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Data/users.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 
 </Project>
