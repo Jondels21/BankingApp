@@ -1,3 +1,4 @@
+
 namespace BankingApp;
 
 public class AccountService
@@ -11,5 +12,28 @@ public class AccountService
         return accounts
             .Where(a => a.UserId == userid)
             .ToList();
+    }
+
+    public Account CreateAccount(int userid, string name, decimal balance)
+    {
+        var accounts = _storage.LoadAccounts();
+
+        var userAccounts = accounts.Where(a => a.UserId == userid);
+
+        var newAccount = new Account
+        {
+            UserId = userid,
+            Id = userAccounts.Any()
+                ? userAccounts.Max(a => a.Id) + 1
+                : 1,
+            Name = name,
+            Balance = balance
+        };
+
+        accounts.Add(newAccount);
+
+       _storage.SaveAccounts(accounts);
+
+        return newAccount;
     }
 }

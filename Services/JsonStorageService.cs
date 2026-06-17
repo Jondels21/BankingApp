@@ -9,6 +9,9 @@ public class JsonStorageService
 
     private readonly string _sessionPath ="Data/session.json";
 
+    private static readonly JsonSerializerOptions _options =
+        new JsonSerializerOptions {WriteIndented = true};
+
     public List<Account> LoadAccounts()
     {
         if (!File.Exists(_accountPath))
@@ -20,6 +23,12 @@ public class JsonStorageService
             ?? new List<Account>();
     }
 
+
+    public void SaveAccounts(List<Account> accounts)
+    {
+        File.WriteAllText(_accountPath, JsonSerializer.Serialize(accounts, _options));
+    }
+
     public List<User> LoadUsers()
     {
         if (!File.Exists(_userPath))
@@ -29,6 +38,11 @@ public class JsonStorageService
 
         return JsonSerializer.Deserialize<List<User>>(json)
             ?? new List<User>();
+    }
+
+    public void SaveUsers(List<User> users)
+    {
+        File.WriteAllText(_userPath, JsonSerializer.Serialize(users, _options));
     }
 
     public Session? LoadSession()

@@ -33,6 +33,9 @@ public class App
             case "logout":
                 return Logout();
 
+            case "create":
+                return CreateAccount(args);
+
             case "list":
                 return HandleList(args);
 
@@ -54,6 +57,7 @@ public class App
                 return 1;
         }
     }
+
 
     private int Init()
     {
@@ -145,12 +149,54 @@ public class App
         return 0;
     }
 
-    private int Logout()
+    private static int Logout()
     {
         var storage = new JsonStorageService();
-        storage.ClearSession();
+        var session = storage.LoadSession();
 
-        Console.WriteLine("Logged out");
+        if (session != null)
+        {
+            storage.ClearSession();
+            Console.WriteLine("Logged out");
+            return 0;
+        }
+        else
+        {
+            Console.WriteLine("You are not logged in.");
+            return 0;
+        }
+
+    }
+
+    private int CreateAccount(string[] args)
+    {
+        if (args.Length < 3)
+        {
+            Console.WriteLine("Usage: Create <Account name> <Balance>");
+            return 1;
+        }
+
+        var storage = new JsonStorageService();
+        var session = storage.LoadSession();
+
+        if (session == null)
+        {
+            Console.WriteLine("You must login first!");
+            return 1;
+        }
+
+        var name = args[1];
+        var balance = Convert.ToDecimal(args[2]);
+
+        var service = new AccountService();
+        var userid = session.UserId;
+
+        var account = service.CreateAccount(userid, name, balance);
+
+        Console.WriteLine("Account created!");
+        Console.WriteLine($"Account name: {account.Name}");
+        Console.WriteLine($"Account balance: {account.Balance}");
+
         return 0;
     }
 
@@ -180,11 +226,20 @@ public class App
                 var service = new AccountService();
                 var accounts = service.GetAccounts(session.UserId);
 
-                foreach (var acc in accounts)
+                if(accounts.Count != 0)
                 {
-                    Console.WriteLine($"{acc.Id} | {acc.Name} | {acc.Balance}");
+                    foreach (var acc in accounts)
+                    {
+                        Console.WriteLine($"{acc.Id} | {acc.Name} | {acc.Balance}");
+                    }
                 }
+                else
+                {
+                    Console.WriteLine("No accounts found.");
+                }
+
                 break;
+
 
             case "users":
                 var userservice = new UserService();

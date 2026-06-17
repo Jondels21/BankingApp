@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
 
 namespace BankingApp;
 
 public class UserService
 {
     private readonly JsonStorageService _storage = new();
-    private const string _userFile = "Data/users.json";
 
     public List<User> GetUsers()
     {
@@ -36,10 +33,7 @@ public class UserService
 
         users.Add(newUser);
 
-        File.WriteAllText(
-            _userFile,
-            System.Text.Json.JsonSerializer.Serialize(users, new System.Text.Json.JsonSerializerOptions {WriteIndented = true})
-        );
+        _storage.SaveUsers(users);
         
         return newUser;
     }
