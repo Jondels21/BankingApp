@@ -16,19 +16,9 @@ public class App
             return 0;
         }
 
-        if (args[0] != "teller")
-        {
-            Console.WriteLine("Error: command must start with 'teller'.");
-            return 1;
-        }
+        var command = args[0];
 
-        if (args.Length == 1)
-        {
-            PrintHelp();
-            return 0;
-        }
-
-        var command = args[1];
+        Console.WriteLine(command);
 
         switch (command)
         {
@@ -71,14 +61,14 @@ public class App
 
     private int Register(string[] args)
     {
-        if (args.Length < 4)
+        if (args.Length < 3)
         {
-            Console.WriteLine("Usage: teller register <name> <password>");
+            Console.WriteLine("Usage: register <name> <password>");
             return 1;
         }
 
-        var name = args[2];
-        var password = args[3];
+        var name = args[1];
+        var password = args[2];
 
         var service = new UserService();
         var user = service.Register(name, password);
@@ -92,14 +82,14 @@ public class App
 
     private int Login(string[] args)
     {
-        if (args.Length < 4)
+        if (args.Length < 3)
         {
-            Console.WriteLine("Usage: teller login <accountNumber> <password>");
+            Console.WriteLine("Usage: login <accountNumber> <password>");
             return 1;
         }
 
-        var accountNumber = args[2];
-        var password = args[3];
+        var accountNumber = args[1];
+        var password = args[2];
 
         var service = new UserService();
         var users = service.GetUsers();
@@ -124,13 +114,13 @@ public class App
 
     private int HandleList(string[] args)
     {
-        if (args.Length < 3)
+        if (args.Length < 1)
         {
             Console.WriteLine("Error: missing list-subcommand");
             return 1;
         }
 
-        var sub = args[2];
+        var sub = args[1];
 
         switch (sub)
         {
@@ -190,13 +180,13 @@ public class App
 
     private int HandleShow(string[] args)
     {
-        if (args.Length < 3)
+        if (args.Length < 2)
         {
             Console.WriteLine("Error: missing show-subcommand");
             return 1;
         }
 
-        var sub = args[2];
+        var sub = args[1];
 
         switch (sub)
         {
@@ -223,15 +213,15 @@ public class App
     private static void PrintHelp()
     {
         Console.WriteLine("Usage:");
-        Console.WriteLine("     teller init");
-        Console.WriteLine("     teller [list] accounts");
-        Console.WriteLine("     teller [list] transactions [<account> --timeframe=<tf> --show-description]");
-        Console.WriteLine("     teller [list] counterparties [<account> --timeframe=<tf> --count=<n>]");
-        Console.WriteLine("     teller [list] (balances|outgoings|incomings) [<account> --interval=<itv> --timeframe=<tf> --output=<of>]");
-        Console.WriteLine("     teller [show] balance [<account> --hide-currency]");
-        Console.WriteLine("     teller [show] outgoing [<account> --hide-currency]");
-        Console.WriteLine("     teller [show] incoming [<account> --hide-currency]");
-        Console.WriteLine("     teller [--help | --version]");
+        Console.WriteLine("     init");
+        Console.WriteLine("     [list] accounts");
+        Console.WriteLine("     [list] transactions [<account> --timeframe=<tf> --show-description]");
+        Console.WriteLine("     [list] counterparties [<account> --timeframe=<tf> --count=<n>]");
+        Console.WriteLine("     [list] (balances|outgoings|incomings) [<account> --interval=<itv> --timeframe=<tf> --output=<of>]");
+        Console.WriteLine("     [show] balance [<account> --hide-currency]");
+        Console.WriteLine("     [show] outgoing [<account> --hide-currency]");
+        Console.WriteLine("     [show] incoming [<account> --hide-currency]");
+        Console.WriteLine("     [--help | --version]");
         Console.WriteLine();
         Console.WriteLine("Commands:");
         Console.WriteLine("     init        Configure");
