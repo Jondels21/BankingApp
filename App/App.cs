@@ -1,4 +1,5 @@
 using System;
+using System.Reflection.PortableExecutable;
 
 namespace BankingApp;
 
@@ -6,7 +7,6 @@ namespace BankingApp;
 
 public class App
 {
-    private User? _currentUser;
 
     public int Execute(string[] args)
     {
@@ -18,18 +18,20 @@ public class App
 
         var command = args[0];
 
-        Console.WriteLine(command);
 
         switch (command)
         {
             case "init":
-                return Init(args);
+                return Init();
 
             case "register":
                 return Register(args);
 
             case "login":
                 return Login(args);
+
+            case "logout":
+                return Logout();
 
             case "list":
                 return HandleList(args);
@@ -53,9 +55,26 @@ public class App
         }
     }
 
-    private int Init(string[] args)
+    private int Init()
     {
-        Console.WriteLine("Configuration started");
+        var dataDir = "Data";
+
+        if(!Directory.Exists(dataDir))
+        {
+            Directory.CreateDirectory(dataDir);
+        }
+
+        var usersPath = Path.Combine(dataDir, "users.json");
+        var accountsPath = Path.Combine(dataDir, "accounts.json");
+
+        if (!File.Exists(usersPath))
+            File.WriteAllText(usersPath, "[]");
+
+        if (!File.Exists(accountsPath))
+            File.WriteAllText(accountsPath, "[]");
+
+        
+        Console.WriteLine("BankingApp initialized");
         return 0;
     }
 
@@ -64,6 +83,15 @@ public class App
         if (args.Length < 3)
         {
             Console.WriteLine("Usage: register <name> <password>");
+            return 1;
+        }
+
+        var storage = new JsonStorageService();
+        var session = storage.LoadSession();
+
+        if (session != null)
+        {
+            Console.WriteLine("You must logout first!");
             return 1;
         }
 
@@ -104,11 +132,25 @@ public class App
             return 1;
         }
 
-        _currentUser = user;
+        var storage = new JsonStorageService();
+
+        storage.SaveSession(new Session
+        {
+            UserId = user.Id
+        });
 
         Console.WriteLine("Login successful");
         Console.WriteLine($"Welcome {user.Name}");
 
+        return 0;
+    }
+
+    private int Logout()
+    {
+        var storage = new JsonStorageService();
+        storage.ClearSession();
+
+        Console.WriteLine("Logged out");
         return 0;
     }
 
@@ -125,7 +167,10 @@ public class App
         switch (sub)
         {
             case "accounts":
-                if (_currentUser == null)
+                var storage = new JsonStorageService();
+                var session = storage.LoadSession();
+
+                if (session == null)
                 {
                     Console.WriteLine("You must login first!");
                     return 1;
@@ -133,7 +178,7 @@ public class App
 
 
                 var service = new AccountService();
-                var accounts = service.GetAccounts(_currentUser.Id);
+                var accounts = service.GetAccounts(session.UserId);
 
                 foreach (var acc in accounts)
                 {
@@ -213,15 +258,15 @@ public class App
     private static void PrintHelp()
     {
         Console.WriteLine("Usage:");
-        Console.WriteLine("     init");
-        Console.WriteLine("     [list] accounts");
-        Console.WriteLine("     [list] transactions [<account> --timeframe=<tf> --show-description]");
-        Console.WriteLine("     [list] counterparties [<account> --timeframe=<tf> --count=<n>]");
-        Console.WriteLine("     [list] (balances|outgoings|incomings) [<account> --interval=<itv> --timeframe=<tf> --output=<of>]");
-        Console.WriteLine("     [show] balance [<account> --hide-currency]");
-        Console.WriteLine("     [show] outgoing [<account> --hide-currency]");
-        Console.WriteLine("     [show] incoming [<account> --hide-currency]");
-        Console.WriteLine("     [--help | --version]");
+        Console.WriteLine("     BankingApp init");
+        Console.WriteLine("     BankingApp [list] accounts");
+        Console.WriteLine("     BankingApp [list] transactions [<account> --timeframe=<tf> --show-description]");
+        Console.WriteLine("     BankingApp [list] counterparties [<account> --timeframe=<tf> --count=<n>]");
+        Console.WriteLine("     BankingApp [list] (balances|outgoings|incomings) [<account> --interval=<itv> --timeframe=<tf> --output=<of>]");
+        Console.WriteLine("     BankingApp [show] balance [<account> --hide-currency]");
+        Console.WriteLine("     BankingApp [show] outgoing [<account> --hide-currency]");
+        Console.WriteLine("     BankingApp [show] incoming [<account> --hide-currency]");
+        Console.WriteLine("     BankingApp [--help | --version]");
         Console.WriteLine();
         Console.WriteLine("Commands:");
         Console.WriteLine("     init        Configure");
