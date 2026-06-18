@@ -1,6 +1,4 @@
 
-using System.Runtime.CompilerServices;
-
 namespace BankingApp;
 
 public class AccountService
@@ -20,6 +18,20 @@ public class AccountService
     {
         return GetAccounts(userId)
             .FirstOrDefault(a => a.Id == accountId);
+    }
+
+    public Account? GetAccountByAddress(string accountAddress)
+    {
+        var accounts = _storage.LoadAccounts();
+
+        if (string.IsNullOrWhiteSpace(accountAddress))
+            return null;
+
+        var input = accountAddress.Replace(" ", "").ToUpper();
+
+        return accounts.FirstOrDefault(a =>
+            a.Address.Replace(" ", "").ToUpper() == input);
+
     }
 
     public Account CreateAccount(int userid, string name)
