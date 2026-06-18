@@ -1,5 +1,3 @@
-using System;
-using System.Reflection.PortableExecutable;
 
 namespace BankingApp;
 
@@ -41,6 +39,9 @@ public class App
 
             case "withdraw":
                 return Withdraw(args);
+
+            case "transfer":
+                return Transfer(args);
 
             case "list":
                 return HandleList(args);
@@ -214,39 +215,22 @@ public class App
             return 1;
         }
 
-        var storage = new JsonStorageService();
-        var session = storage.LoadSession();
-
-        if (session == null)
+        if (!int.TryParse(args[1], out var accountId) ||
+            !decimal.TryParse(args[2], out var amount))
         {
-            Console.WriteLine("You must login first!");
+            Console.WriteLine("Invalid input.");
             return 1;
         }
 
-        if (!int.TryParse(args[1], out var accountId))
-        {
-            Console.WriteLine("Invalid account id.");
-            return 1;
-        }
-
-        if (!decimal.TryParse(args[2], out var amount))
-        {
-            Console.WriteLine("Invalid amount.");
-            return 1;
-        }
-
-        if (amount <= 0)
-        {
-            Console.WriteLine("Amount must be greater than 0");
-            return 1;
-        }
 
         var service = new TransactionService();
-        service.Deposit(accountId, amount);
 
-        Console.WriteLine("Deposit successful.");
+        var result = service.Deposit(accountId, amount);
 
-        return 0;
+
+        Console.WriteLine(result.Message);
+
+        return result.Success ? 0 : 1;
     }
 
     private int Withdraw(string[] args)
@@ -257,37 +241,46 @@ public class App
             return 1;   
         }
 
-        var storage = new JsonStorageService();
-        var session = storage.LoadSession();
-
-        if (session == null)
+        if (!int.TryParse(args[1], out var accountId) ||
+            !decimal.TryParse(args[2], out var amount))
         {
-            Console.WriteLine("You must login first!");
-            return 1;
-        }
-
-        if (!int.TryParse(args[1], out var accountId))
-        {
-            Console.WriteLine("Invalid account id.");
-            return 1;
-        }
-
-        if (!decimal.TryParse(args[2], out var amount))
-        {
-            Console.WriteLine("Invalid amount.");
-            return 1;
-        }
-
-        if (amount <= 0)
-        {
-            Console.WriteLine("Amount must be greater than 0");
+            Console.WriteLine("Invalid input.");
             return 1;
         }
 
         var service = new TransactionService();
-        service.Withdraw(accountId, amount);
 
-        return 0;
+        var result = service.Withdraw(accountId,amount);
+
+        Console.WriteLine(result.Message);
+
+        return result.Success ? 0 : 1;
+    }
+
+    private int Transfer(string[] args)
+    {
+        if (args.Length != 4)
+        {
+            Console.WriteLine("Usage: Transfer <Account> <Amount> <Destination Address");
+            return 1;
+        }
+
+        if (!int.TryParse(args[1], out var accountId) ||
+            !decimal.TryParse(args[2], out var amount))
+        {
+            Console.WriteLine("Invalid input.");
+            return 1;
+        }
+
+        var destination = args[3];
+
+        var service = new TransactionService();
+
+        var result = service.Transfer(accountId, amount, destination);
+
+        Console.WriteLine(result.Message);
+
+        return result.Success ? 0 : 1;
     }
 
     private int HandleList(string[] args)
