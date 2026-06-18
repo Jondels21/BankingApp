@@ -1,4 +1,6 @@
 
+using System.Runtime.CompilerServices;
+
 namespace BankingApp;
 
 public class AccountService
@@ -26,6 +28,10 @@ public class AccountService
 
         var userAccounts = accounts.Where(a => a.UserId == userid);
 
+        string accountAddress;
+
+        accountAddress = AddressGenerator.Generate();
+
         var newAccount = new Account
         {
             UserId = userid,
@@ -33,6 +39,7 @@ public class AccountService
                 ? userAccounts.Max(a => a.Id) + 1
                 : 1,
             Name = name,
+            Address = accountAddress
         };
 
         accounts.Add(newAccount);

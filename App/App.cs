@@ -200,6 +200,7 @@ public class App
 
         Console.WriteLine("Account created!");
         Console.WriteLine($"Account name: {account.Name}");
+        Console.WriteLine($"Account address: {account.Address}");
         Console.WriteLine($"Account balance: {account.Balance}");
 
         return 0;
@@ -319,7 +320,7 @@ public class App
                 {
                     foreach (var acc in accounts)
                     {
-                        Console.WriteLine($"{acc.Id} | {acc.Name} | {acc.Balance}");
+                        Console.WriteLine($"{acc.Id} | {acc.Name} | {acc.Address} | {acc.Balance}");
                     }
                 }
                 else
