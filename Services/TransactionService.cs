@@ -24,4 +24,30 @@ public class TransactionService
         _account.UpdateAccount(account.UserId, account.Id, newBalance);
 
     }
+
+    public void Withdraw(int accountId, decimal amount)
+    {
+        var session = _storage.LoadSession();
+
+        if (session == null)
+            return;
+
+        var account = _account.GetAccountById(session.UserId, accountId);
+
+        if (account == null)
+            return;
+
+        if(amount <= account.Balance)
+        {
+            var newBalance = account.Balance - amount;
+            _account.UpdateAccount(account.UserId, account.Id, newBalance);
+            Console.WriteLine("Withdraw successful.");
+        }
+        else
+        {
+            Console.WriteLine("insufficient funds.");
+            return;
+        }
+        
+    }
 }

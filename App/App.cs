@@ -39,6 +39,9 @@ public class App
             case "deposit":
                 return Deposit(args);
 
+            case "withdraw":
+                return Withdraw(args);
+
             case "list":
                 return HandleList(args);
 
@@ -241,6 +244,47 @@ public class App
         service.Deposit(accountId, amount);
 
         Console.WriteLine("Deposit successful.");
+
+        return 0;
+    }
+
+    private int Withdraw(string[] args)
+    {
+        if (args.Length != 3)
+        {
+            Console.WriteLine("Usage: Withdraw <Account> <Amount>");
+            return 1;   
+        }
+
+        var storage = new JsonStorageService();
+        var session = storage.LoadSession();
+
+        if (session == null)
+        {
+            Console.WriteLine("You must login first!");
+            return 1;
+        }
+
+        if (!int.TryParse(args[1], out var accountId))
+        {
+            Console.WriteLine("Invalid account id.");
+            return 1;
+        }
+
+        if (!decimal.TryParse(args[2], out var amount))
+        {
+            Console.WriteLine("Invalid amount.");
+            return 1;
+        }
+
+        if (amount <= 0)
+        {
+            Console.WriteLine("Amount must be greater than 0");
+            return 1;
+        }
+
+        var service = new TransactionService();
+        service.Withdraw(accountId, amount);
 
         return 0;
     }
