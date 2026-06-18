@@ -14,7 +14,7 @@ public class AccountService
             .ToList();
     }
 
-    public Account CreateAccount(int userid, string name, decimal balance)
+    public Account CreateAccount(int userid, string name)
     {
         var accounts = _storage.LoadAccounts();
 
@@ -27,7 +27,6 @@ public class AccountService
                 ? userAccounts.Max(a => a.Id) + 1
                 : 1,
             Name = name,
-            Balance = balance
         };
 
         accounts.Add(newAccount);

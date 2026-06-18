@@ -170,9 +170,9 @@ public class App
 
     private int CreateAccount(string[] args)
     {
-        if (args.Length < 3)
+        if (args.Length < 2)
         {
-            Console.WriteLine("Usage: Create <Account name> <Balance>");
+            Console.WriteLine("Usage: Create <Account name>");
             return 1;
         }
 
@@ -186,12 +186,11 @@ public class App
         }
 
         var name = args[1];
-        var balance = Convert.ToDecimal(args[2]);
 
         var service = new AccountService();
         var userid = session.UserId;
 
-        var account = service.CreateAccount(userid, name, balance);
+        var account = service.CreateAccount(userid, name);
 
         Console.WriteLine("Account created!");
         Console.WriteLine($"Account name: {account.Name}");
