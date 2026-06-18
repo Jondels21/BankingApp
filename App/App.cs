@@ -36,6 +36,9 @@ public class App
             case "create":
                 return CreateAccount(args);
 
+            case "deposit":
+                return Deposit(args);
+
             case "list":
                 return HandleList(args);
 
@@ -170,7 +173,7 @@ public class App
 
     private int CreateAccount(string[] args)
     {
-        if (args.Length < 2)
+        if (args.Length != 2)
         {
             Console.WriteLine("Usage: Create <Account name>");
             return 1;
@@ -195,6 +198,49 @@ public class App
         Console.WriteLine("Account created!");
         Console.WriteLine($"Account name: {account.Name}");
         Console.WriteLine($"Account balance: {account.Balance}");
+
+        return 0;
+    }
+
+    private int Deposit(string[] args)
+    {
+        if (args.Length != 3)
+        {
+            Console.WriteLine("Usage: Deposit <Account> <Amount>");
+            return 1;
+        }
+
+        var storage = new JsonStorageService();
+        var session = storage.LoadSession();
+
+        if (session == null)
+        {
+            Console.WriteLine("You must login first!");
+            return 1;
+        }
+
+        if (!int.TryParse(args[1], out var accountId))
+        {
+            Console.WriteLine("Invalid account id.");
+            return 1;
+        }
+
+        if (!decimal.TryParse(args[2], out var amount))
+        {
+            Console.WriteLine("Invalid amount.");
+            return 1;
+        }
+
+        if (amount <= 0)
+        {
+            Console.WriteLine("Amount must be greater than 0");
+            return 1;
+        }
+
+        var service = new TransactionService();
+        service.Deposit(accountId, amount);
+
+        Console.WriteLine("Deposit successful.");
 
         return 0;
     }
