@@ -14,6 +14,12 @@ public class AccountService
             .ToList();
     }
 
+    public Account? GetAccountById(int userId, int accountId)
+    {
+        return GetAccounts(userId)
+            .FirstOrDefault(a => a.Id == accountId);
+    }
+
     public Account CreateAccount(int userid, string name)
     {
         var accounts = _storage.LoadAccounts();
@@ -34,5 +40,24 @@ public class AccountService
        _storage.SaveAccounts(accounts);
 
         return newAccount;
+    }
+
+    public Account? UpdateAccount(int userId, int accountId, decimal balance)
+    {
+        var accounts = _storage.LoadAccounts();
+
+        var account = accounts.FirstOrDefault(a =>
+            a.UserId == userId &&
+            a.Id == accountId);
+
+        if (account == null)
+            return null;
+
+        account.Balance = balance;
+
+        _storage.SaveAccounts(accounts);
+
+        return account;
+        
     }
 }
