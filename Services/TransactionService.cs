@@ -5,6 +5,30 @@ public class TransactionService
 {
     private readonly AccountService _account = new();
     private readonly JsonStorageService _storage = new();
+
+    public void Create(string type, decimal amount, string from, string to)
+    {
+        var transactions = _storage.LoadTransactions();
+
+        var transaction = new Transaction
+        {
+            Id = transactions.Any()
+                ? transactions.Max(t => t.Id) + 1
+                : 1,
+            Type = type,
+            Amount = amount,
+            FromAddress = from,
+            ToAddress = to,
+            Timestamp = DateTime.UtcNow
+  
+        };
+
+        transactions.Add(transaction);
+
+        _storage.SaveTransaction(transactions);
+    }
+
+
     public OperationResult Deposit(int accountId, decimal amount)
     {
         var session = _storage.LoadSession();
@@ -22,6 +46,8 @@ public class TransactionService
 
         account.Balance += amount;
         _account.UpdateAccount(account.UserId, account.Id, account.Balance);
+
+        Create("Deposit,", amount, "SYSTEM", account.Address);
 
         return OperationResult.Ok("Deposit successful.");
 
@@ -47,6 +73,8 @@ public class TransactionService
 
         account.Balance -= amount;
         _account.UpdateAccount(account.UserId, account.Id, account.Balance);
+
+        Create("Withdraw", amount, account.Address, "CASH");
 
         return OperationResult.Ok("Withdraw successful.");
 
@@ -82,6 +110,8 @@ public class TransactionService
 
         _account.UpdateAccount(senderAccount.UserId, senderAccount.Id, senderAccount.Balance);
         _account.UpdateAccount(destinationAccount.UserId, destinationAccount.Id, destinationAccount.Balance);
+
+        Create("Transfer", amount, senderAccount.Address, destinationAccount.Address);
 
         return OperationResult.Ok("Transfer successful.");
 
