@@ -1,4 +1,6 @@
+using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Threading.Tasks.Dataflow;
 
 namespace BankingApp;
 
@@ -8,6 +10,8 @@ public class JsonStorageService
     private readonly string _userPath = "Data/users.json";
 
     private readonly string _sessionPath ="Data/session.json";
+
+    private readonly string _transactionPath ="Data/transactions.json";
 
     private static readonly JsonSerializerOptions _options =
         new JsonSerializerOptions {WriteIndented = true};
@@ -74,5 +78,21 @@ public class JsonStorageService
         {
             File.Delete(_sessionPath);
         }
+    }
+
+    public List<Transaction> LoadTransactions()
+    {
+        if (!File.Exists(_transactionPath))
+            return new List<Transaction>();
+
+        var json = File.ReadAllText(_transactionPath);
+
+        return JsonSerializer.Deserialize<List<Transaction>>(json)
+            ?? new List<Transaction>();
+    }
+
+    public void SaveTransaction(List<Transaction> transactions)
+    {
+        File.WriteAllText(_transactionPath, JsonSerializer.Serialize(transactions, _options));
     }
 }
