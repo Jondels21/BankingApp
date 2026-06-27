@@ -26,7 +26,7 @@ public class UserService
         }
 
         var PasswordValidation = UserValidator.ValidatePassword(password);
-        
+
         if (!PasswordValidation.Success)
         {
             return OperationResult<User>.Fail(PasswordValidation.Message);
@@ -56,5 +56,46 @@ public class UserService
         _storage.SaveUsers(users);
         
         return OperationResult<User>.Ok(newUser, "User created.");
+    }
+
+    public OperationResult Login(string accountNumber, string password)
+    {
+        var session = _storage.LoadSession();
+        if (session != null)
+        {
+            return OperationResult.Fail("You must logout first!");
+        }
+
+        var users = GetUsers();
+
+        var user = users.FirstOrDefault(u =>
+            u.AccountNumber == accountNumber &&
+            u.Password == password);
+
+        if (user == null)
+        {
+            return OperationResult.Fail("Invalid credentials");
+        }
+
+        _storage.SaveSession(new Session
+        {
+            UserId = user.Id
+        });
+
+
+        return OperationResult.Ok($"Welcome {user.Name}");
+    }
+
+    public OperationResult Logout()
+    {
+        var session = _storage.LoadSession();
+        if (session == null)
+        {
+            return OperationResult.Fail("You are not logged in.");
+        }
+
+        _storage.ClearSession();
+
+        return OperationResult.Ok("Logged out.");
     }
 }

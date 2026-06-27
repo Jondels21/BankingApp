@@ -128,47 +128,33 @@ public class App
         var password = args[2];
 
         var service = new UserService();
-        var users = service.GetUsers();
+        var result = service.Login(accountNumber, password);
 
-        var user = users.FirstOrDefault(u =>
-            u.AccountNumber == accountNumber &&
-            u.Password == password);
-
-        if (user == null)
+        if(!result.Success)
         {
-            Console.WriteLine("Invalid credentials");
+            Console.WriteLine(result.Message);
             return 1;
         }
 
-        var storage = new JsonStorageService();
-
-        storage.SaveSession(new Session
-        {
-            UserId = user.Id
-        });
-
-        Console.WriteLine("Login successful");
-        Console.WriteLine($"Welcome {user.Name}");
+        Console.WriteLine(result.Message);
 
         return 0;
     }
 
     private static int Logout()
     {
-        var storage = new JsonStorageService();
-        var session = storage.LoadSession();
+        var service = new UserService();
+        var result = service.Logout();
 
-        if (session != null)
+        if (!result.Success)
         {
-            storage.ClearSession();
-            Console.WriteLine("Logged out");
-            return 0;
+            Console.WriteLine(result.Message);
+            return 1;
         }
-        else
-        {
-            Console.WriteLine("You are not logged in.");
-            return 0;
-        }
+
+        Console.WriteLine(result.Message);
+
+        return 0;
 
     }
 
@@ -219,10 +205,16 @@ public class App
 
         var result = service.Deposit(accountId, amount);
 
+        if (!result.Success)
+        {
+            Console.WriteLine(result.Message);
+            return 1;
+        }
+
 
         Console.WriteLine(result.Message);
 
-        return result.Success ? 0 : 1;
+        return 0;
     }
 
     private int Withdraw(string[] args)
@@ -244,9 +236,15 @@ public class App
 
         var result = service.Withdraw(accountId,amount);
 
+        if (!result.Success)
+        {
+            Console.WriteLine(result.Message);
+            return 1;
+        }
+
         Console.WriteLine(result.Message);
 
-        return result.Success ? 0 : 1;
+        return 0;
     }
 
     private int Transfer(string[] args)
@@ -270,9 +268,15 @@ public class App
 
         var result = service.Transfer(accountId, amount, destination);
 
+        if (!result.Success)
+        {
+            Console.WriteLine(result.Message);
+            return 1;
+        }
+
         Console.WriteLine(result.Message);
 
-        return result.Success ? 0 : 1;
+        return 0;
     }
 
     private int HandleList(string[] args)
