@@ -28,6 +28,32 @@ public class TransactionService
         _storage.SaveTransaction(transactions);
     }
 
+    public OperationResult<List<Transaction>> GetTransactions(int accountid)
+    {
+        var session = _storage.LoadSession();
+
+        if (session == null)
+        {
+            return OperationResult<List<Transaction>>.Fail("You must login first!");
+        }
+
+        var account = _account.GetAccountById(session.UserId, accountid);
+        if(account == null)
+        {
+            return OperationResult<List<Transaction>>.Fail("Account not found.");
+        }
+
+        var address = account.Address;
+
+        var transactions = _storage.LoadTransactions();
+
+        var list = transactions
+            .Where(t => t.FromAddress == address || t.ToAddress == address)
+            .ToList();
+
+        return OperationResult<List<Transaction>>.Ok(list);
+    }
+
 
     public OperationResult Deposit(int accountId, decimal amount)
     {
@@ -47,7 +73,7 @@ public class TransactionService
         account.Balance += amount;
         _account.UpdateAccount(account.UserId, account.Id, account.Balance);
 
-        Create("Deposit,", amount, "SYSTEM", account.Address);
+        Create("Deposit", amount, "SYSTEM", account.Address);
 
         return OperationResult.Ok("Deposit successful.");
 

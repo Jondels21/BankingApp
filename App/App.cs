@@ -335,7 +335,32 @@ public class App
                 break;
 
             case "transactions":
-                Console.WriteLine("Listing transactions...");
+
+                if (args.Length < 3)
+                {
+                    Console.WriteLine("Usage: list transactions <account>");
+                    return 1;
+                }
+
+                if (!int.TryParse(args[2], out var account))
+                {
+                    Console.WriteLine("Invalid input.");
+                }
+
+                var transactionService = new TransactionService();
+                var result = transactionService.GetTransactions(account);
+
+                if(!result.Success)
+                {
+                    Console.WriteLine(result.Message);
+                    return 1;
+                }
+
+                foreach (var transaction in result.Data!)
+                {
+                    Console.WriteLine($"{transaction.Id} | Type: {transaction.Type} | From: {transaction.FromAddress} | To: {transaction.ToAddress} | Amount: {transaction.Amount} | At: {transaction.Timestamp}");
+                }
+
                 break;
 
             case "counterparties":
