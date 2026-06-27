@@ -183,26 +183,21 @@ public class App
             return 1;
         }
 
-        var storage = new JsonStorageService();
-        var session = storage.LoadSession();
-
-        if (session == null)
-        {
-            Console.WriteLine("You must login first!");
-            return 1;
-        }
-
         var name = args[1];
 
         var service = new AccountService();
-        var userid = session.UserId;
 
-        var account = service.CreateAccount(userid, name);
+        var result = service.CreateAccount(name);
 
-        Console.WriteLine("Account created!");
-        Console.WriteLine($"Account name: {account.Name}");
-        Console.WriteLine($"Account address: {account.Address}");
-        Console.WriteLine($"Account balance: {account.Balance}");
+        if(!result.Success)
+        {
+            Console.WriteLine(result.Message);
+            return 1;
+        }
+        Console.WriteLine(result.Message);
+        Console.WriteLine($"Account name: {result.Data.Name}");
+        Console.WriteLine($"Account address: {result.Data.Address}");
+        Console.WriteLine($"Account balance: {result.Data.Balance}");
 
         return 0;
     }

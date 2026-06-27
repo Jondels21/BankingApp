@@ -34,15 +34,28 @@ public class AccountService
 
     }
 
-    public Account CreateAccount(int userid, string name)
+    public OperationResult<Account> CreateAccount(string name)
     {
+        var session = _storage.LoadSession();
+        if(session == null)
+        {
+            return OperationResult<Account>.Fail("You must login first!");
+        }
+
+        var validation = AccountValidator.ValidateName(name);
+
+        if (!validation.Success)
+        {
+            return OperationResult<Account>.Fail(validation.Message);
+        }
+
+        int userid = session.UserId;
+
         var accounts = _storage.LoadAccounts();
 
         var userAccounts = accounts.Where(a => a.UserId == userid);
 
-        string accountAddress;
-
-        accountAddress = AddressGenerator.Generate();
+        string accountAddress = AddressGenerator.Generate();
 
         var newAccount = new Account
         {
@@ -58,7 +71,7 @@ public class AccountService
 
        _storage.SaveAccounts(accounts);
 
-        return newAccount;
+        return OperationResult<Account>.Ok(newAccount, "Account created.");
     }
 
     public Account? UpdateAccount(int userId, int accountId, decimal balance)
