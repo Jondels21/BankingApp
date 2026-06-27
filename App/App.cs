@@ -340,6 +340,7 @@ public class App
                 if (!int.TryParse(args[2], out var account))
                 {
                     Console.WriteLine("Invalid input.");
+                    return 1;
                 }
 
                 var transactionService = new TransactionService();
@@ -351,10 +352,13 @@ public class App
                     return 1;
                 }
 
-                foreach (var transaction in result.Data!)
+                Console.WriteLine(result.Message);
+
+                foreach (var transaction in result.Data)
                 {
                     Console.WriteLine($"{transaction.Id} | Type: {transaction.Type} | From: {transaction.FromAddress} | To: {transaction.ToAddress} | Amount: {transaction.Amount} | At: {transaction.Timestamp}");
                 }
+
 
                 break;
 

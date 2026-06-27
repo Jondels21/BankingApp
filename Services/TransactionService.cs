@@ -51,6 +51,11 @@ public class TransactionService
             .Where(t => t.FromAddress == address || t.ToAddress == address)
             .ToList();
 
+        if (list.Count == 0)
+        {
+            return OperationResult<List<Transaction>>.Ok(list, "No transactions found.");
+        }
+
         return OperationResult<List<Transaction>>.Ok(list);
     }
 
