@@ -38,4 +38,18 @@ public static class UserValidator
         return OperationResult.Ok("Valid");
         
     }
+
+    public static OperationResult ValidatePassword(string password)
+    {
+        if (string.IsNullOrWhiteSpace(password))
+            return OperationResult.Fail("Password cannot be empty.");
+
+        if (password.Length != 4)
+            return OperationResult.Fail("Password must contain 4 digits.");
+
+        if (!password.All(c => char.IsDigit(c)))
+            return OperationResult.Fail("Password can only contain numbers");
+
+        return OperationResult.Ok("Valid");
+    }
 }

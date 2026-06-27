@@ -18,11 +18,18 @@ public class UserService
             return OperationResult<User>.Fail("You must logout first!");
         }
 
-        var validation = UserValidator.ValidateUsername(name);
+        var NameValidation = UserValidator.ValidateUsername(name);
 
-        if(!validation.Success)
+        if(!NameValidation.Success)
         {
-            return OperationResult<User>.Fail(validation.Message);
+            return OperationResult<User>.Fail(NameValidation.Message);
+        }
+
+        var PasswordValidation = UserValidator.ValidatePassword(password);
+        
+        if (!PasswordValidation.Success)
+        {
+            return OperationResult<User>.Fail(PasswordValidation.Message);
         }
 
         var users = GetUsers();
