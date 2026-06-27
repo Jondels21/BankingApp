@@ -37,7 +37,7 @@ public class AccountService
     public OperationResult<Account> CreateAccount(string name)
     {
         var session = _storage.LoadSession();
-        if(session == null)
+        if (session == null)
         {
             return OperationResult<Account>.Fail("You must login first!");
         }
