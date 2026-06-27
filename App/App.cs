@@ -97,24 +97,21 @@ public class App
             return 1;
         }
 
-        var storage = new JsonStorageService();
-        var session = storage.LoadSession();
-
-        if (session != null)
-        {
-            Console.WriteLine("You must logout first!");
-            return 1;
-        }
-
         var name = args[1];
         var password = args[2];
 
         var service = new UserService();
-        var user = service.Register(name, password);
+        var result = service.Register(name, password);
 
-        Console.WriteLine("User created!");
-        Console.WriteLine($"Name: {user.Name}");
-        Console.WriteLine($"Account number: {user.AccountNumber}");
+        if(!result.Success)
+        {
+            Console.WriteLine(result.Message);
+            return 1;
+        }
+
+        Console.WriteLine(result.Message);
+        Console.WriteLine($"Name: {result.Data.Name}");
+        Console.WriteLine($"Account number: {result.Data.AccountNumber}");
 
         return 0;
     }

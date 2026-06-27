@@ -10,8 +10,21 @@ public class UserService
         return _storage.LoadUsers();
     }
 
-    public User Register(string name, string password)
+    public OperationResult<User> Register(string name, string password)
     {
+        var session = _storage.LoadSession();
+        if (session != null)
+        {
+            return OperationResult<User>.Fail("You must logout first!");
+        }
+
+        var validation = UserValidator.ValidateUsername(name);
+
+        if(!validation.Success)
+        {
+            return OperationResult<User>.Fail(validation.Message);
+        }
+
         var users = GetUsers();
 
         var rnd = new Random();
@@ -35,6 +48,6 @@ public class UserService
 
         _storage.SaveUsers(users);
         
-        return newUser;
+        return OperationResult<User>.Ok(newUser, "User created.");
     }
 }
